@@ -11,7 +11,7 @@ cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
  mkdir /etc/containerd
  sudo containerd config default | sudo tee /etc/containerd/config.toml
 
- sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+ sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 
 root@azvm01:~# kubeadm init --apiserver-advertise-address=172.16.1.7 
