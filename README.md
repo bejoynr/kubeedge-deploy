@@ -37,7 +37,7 @@ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versio
 
 ```
 
-## Add SAN to API server certs
+## Add SAN to API server certs - not needed if cluster was deployed with public IP
 
 ```
  kubectl get configmap -n kube-system kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
