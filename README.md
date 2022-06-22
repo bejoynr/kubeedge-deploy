@@ -14,11 +14,11 @@ cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
  sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 
-root@azvm01:~# kubeadm init --apiserver-advertise-address=172.16.1.7 
-[init] Using Kubernetes version: v1.24.2
-Your Kubernetes control-plane has initialized successfully!
+kubeadm init --apiserver-advertise-address=172.16.1.7 
 
-To start using your cluster, you need to run the following as a regular user:
+`[init] Using Kubernetes version: v1.24.2`
+`Your Kubernetes control-plane has initialized successfully!`
+`To start using your cluster, you need to run the following as a regular user:`
 
   mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
