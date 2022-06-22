@@ -49,7 +49,7 @@ apiServer:
 
  crictl pods | grep apiserver | cut -d' ' -f1
 
- crictl stop  -r unix:///run/containerd/containerd.sock d457ac5069aba4dad5901af0a4e140d42e928f5d50c362e41afee3d72f3a62d7
+ crictl stop <container-id>
 
  ```
 
@@ -641,7 +641,7 @@ kubeedge      nginx-deployment-5878dd8b8-7f27h   1/1     Running   0            
 <details>
   <summary>Solution</summary>
 
-  Edit daemonset `kubectl edit daemonsets.apps -n kube-system kube-proxy` include `affinity section`.
+  Edit daemonset `kubectl edit daemonsets.apps -n kube-system kube-proxy` and add `affinity section`.
 
   ```yaml
 apiVersion: apps/v1
