@@ -6,27 +6,15 @@ cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
 > net.bridge.bridge-nf-call-ip6tables = 1
 > EOF
 
- sudo sysctl --system
+sudo sysctl --system
 
- mkdir /etc/containerd
- sudo containerd config default | sudo tee /etc/containerd/config.toml
+mkdir /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml
 
- sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 
 kubeadm init --apiserver-advertise-address=172.16.1.7 
-
-`[init] Using Kubernetes version: v1.24.2`
-`Your Kubernetes control-plane has initialized successfully!`
-`To start using your cluster, you need to run the following as a regular user:`
-
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-Alternatively, if you are the root user, you can run:
-
-  export KUBECONFIG=/etc/kubernetes/admin.conf
 
 ```
 
@@ -40,9 +28,9 @@ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versio
 ## Add SAN to API server certs - not needed if cluster was deployed with public IP
 
 ```
- kubectl get configmap -n kube-system kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
+kubectl get configmap -n kube-system kubeadm-config -o jsonpath='{.data.ClusterConfiguration}' > kubeadm-config.yaml
 
- vi kubeadm-config.yaml
+vi kubeadm-config.yaml
 
 apiServer:
   certSANs:
@@ -52,6 +40,7 @@ apiServer:
   extraArgs:
  .
  .
+
  mv /etc/kubernetes/pki/apiserver.{crt,key} ~
 
  kubeadm init phase certs apiserver --config kubeadm-config.yaml
@@ -61,7 +50,6 @@ apiServer:
  export CONTAINER_RUNTIME_ENDPOINT="unix:///run/containerd/containerd.sock"
 
  crictl stop  -r unix:///run/containerd/containerd.sock d457ac5069aba4dad5901af0a4e140d42e928f5d50c362e41afee3d72f3a62d7
-
 
  ```
 
@@ -76,15 +64,15 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kuber
  ```
 wget https://github.com/kubeedge/kubeedge/releases/download/v1.11.0/keadm-v1.11.0-linux-amd64.tar.gz
 
- wget https://github.com/kubeedge/kubeedge/releases/download/v1.11.0/kubeedge-v1.11.0-linux-amd64.tar.gz
+wget https://github.com/kubeedge/kubeedge/releases/download/v1.11.0/kubeedge-v1.11.0-linux-amd64.tar.gz
 
-  git clone https://github.com/kubeedge/kubeedge.git
+git clone https://github.com/kubeedge/kubeedge.git
 
-  wget https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
+wget https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
 
-  root@azvm01:~/Kube-edge/kubeedge/manifests/charts# helm upgrade --install cloudcore ./cloudcore  -f ./cloudcore/values.yaml --namespace kubeedge --debug --dry-run --create-namespace --set cloudCore.modules.cloudHub.advertiseAddress[0]=20.xxx.186.xx
-  ```
-  ## Helm debug info
+~/Kube-edge/kubeedge/manifests/charts# helm upgrade --install cloudcore ./cloudcore  -f ./cloudcore/values.yaml --namespace kubeedge --debug --dry-run --create-namespace --set cloudCore.modules.cloudHub.advertiseAddress[0]=20.xxx.186.xx
+```
+## Helm debug info
 <details>
   <summary>Debug info</summary>
 
@@ -555,11 +543,14 @@ wget https://github.com/kubeedge/kubeedge/releases/download/v1.11.0/keadm-v1.11.
 certgen.sh buildSecret | tee -a 06-secret.yaml
 
 kubectl  apply -f 06-secret.yaml
+```
+## Get token for keadm
+```
 
 keadm gettoken --kube-config /root/.kube/config
 
 ```
-## On edge node
+## On edge node 
 
 ```
 sudo ./keadm join --cloudcore-ipport=20.223.186.57:10000 --token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx --edgenode-name=pi4-home --kubeedge-version=1.11.0 --tarballpath=./
@@ -567,6 +558,7 @@ sudo ./keadm join --cloudcore-ipport=20.223.186.57:10000 --token=xxxxxxxxxxxxxxx
 ```
 <details>
   <summary>Details of execution</summary>
+ 
   ```  
   I0621 13:23:19.107991   23287 command.go:845] 1. Check KubeEdge edgecore     process status
   I0621 13:23:19.163661   23287 command.go:845] 2. Check if the management     directory is clean
@@ -594,15 +586,17 @@ journalctl -u edgecore.service -xe -f
 sudo systemctl  status edgecore
 
 ```
-
 ## Check status of edge node in cluster
 ```
 $ k get node
 NAME       STATUS   ROLES           AGE     VERSION
 azvm01     Ready    control-plane   6h9m    v1.24.2
 pi4-home   Ready    agent,edge      3h27m   v1.22.6-kubeedge-v1.11.0
+```
 
+## Deploy a nginx pod on edge for testing
 
+```yaml
 $ cat nginx-depoyment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -629,11 +623,11 @@ spec:
 ```
 kubectl apply -f nginx.yaml
 
-root@azvm01:~# k get po -A -o wide
-NAMESPACE     NAME                               READY   STATUS    RESTARTS         AGE     IP             NODE       NOMINATED NODE   READINESS GATES
-.
-.
-.
+k get po -A -o wide
+
+NAMESPACE     NAME                               READY   STATUS    RESTARTS         AGE     IP             NODE       
+
+....
 kubeedge      nginx-deployment-5878dd8b8-7f27h   1/1     Running   0                3h9m    172.17.0.3     pi4-home              
 
 ```
@@ -643,7 +637,7 @@ kubeedge      nginx-deployment-5878dd8b8-7f27h   1/1     Running   0            
 <details>
   <summary>Solution</summary>
 
-  Edit the `kubectl edit daemonsets.apps -n kube-system kube-proxy` file to include `affinity section` under `spec`.
+  Edit daemonset `kubectl edit daemonsets.apps -n kube-system kube-proxy` include `affinity section`.
 
   ```yaml
 apiVersion: apps/v1
