@@ -70,7 +70,11 @@ git clone https://github.com/kubeedge/kubeedge.git
 
 wget https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
 
-~/Kube-edge/kubeedge/manifests/charts# helm upgrade --install cloudcore ./cloudcore  -f ./cloudcore/values.yaml --namespace kubeedge --debug --dry-run --create-namespace --set cloudCore.modules.cloudHub.advertiseAddress[0]=20.xxx.186.xx
+~/Kube-edge/kubeedge/manifests/charts# helm upgrade --install cloudcore ./cloudcore  -f ./cloudcore/values.yaml --namespace kubeedge --debug --dry-run --create-namespace --set cloudCore.modules.cloudHub.advertiseAddress[0]=xx.xxx.xx.xx
+
+k get pods -n kubeedge
+NAME                               READY   STATUS              RESTARTS   AGE
+cloudcore-67ffb5fbb7-xxrwx         1/1     Running             0          22h
 ```
 ## Helm debug info
 <details>
