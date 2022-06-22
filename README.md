@@ -44,10 +44,10 @@ apiServer:
  mv /etc/kubernetes/pki/apiserver.{crt,key} ~
 
  kubeadm init phase certs apiserver --config kubeadm-config.yaml
+ 
+ export CONTAINER_RUNTIME_ENDPOINT="unix:///run/containerd/containerd.sock"
 
  crictl pods | grep apiserver | cut -d' ' -f1
-
- export CONTAINER_RUNTIME_ENDPOINT="unix:///run/containerd/containerd.sock"
 
  crictl stop  -r unix:///run/containerd/containerd.sock d457ac5069aba4dad5901af0a4e140d42e928f5d50c362e41afee3d72f3a62d7
 
